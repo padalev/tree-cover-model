@@ -20,7 +20,33 @@ def dTdt(P,T):
 def dPdt(P,T):
     return r_P*((P + b*T/K) - P)
 
-T = np.linspace(-1,90,1000)
+T = np.linspace(1,100,1000)
 plt.plot(T,dTdt(3.5,T))
+plt.grid()
+plt.show()
+
+
+maxNumSolutions = 10
+pericipationvalues = 1000
+Tvalues = 10000
+solutions = np.zeros((pericipationvalues,maxNumSolutions))
+percounter = 0
+
+pericipation = np.linspace(0,5,pericipationvalues)
+for per in pericipation:
+    solcounter = 0
+    T = np.linspace(-1,101,Tvalues)
+    dt = dTdt(per,T)
+    dt = dt**2
+    for k in range(Tvalues-2):
+        if((dt.item(k+1))<(dt.item(k))):
+            if((dt.item(k+1))<(dt.item(k+2))):
+                solutions.itemset((percounter,solcounter), T.item(k))
+                solcounter = solcounter + 1
+        
+    percounter = percounter + 1
+solutions.sort(axis=1)
+print "Die Antwort lautet: " + str(solutions)
+plt.plot(pericipation,solutions)
 plt.grid()
 plt.show()
