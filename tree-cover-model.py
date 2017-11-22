@@ -20,33 +20,61 @@ def dTdt(P,T):
 def dPdt(P,T):
     return r_P*((P + b*T/K) - P)
 
+
+plt.figure(1)
 T = np.linspace(1,100,1000)
-plt.plot(T,dTdt(3.5,T))
+plt.plot(T,dTdt(1.5,T))
+plt.plot(T,dTdt(1.5,T)**2)
 plt.grid()
-plt.show()
 
 
-maxNumSolutions = 10
-pericipationvalues = 1000
+maxNumSolutions = 5
+precipitationvalues = 1000
 Tvalues = 10000
-solutions = np.zeros((pericipationvalues,maxNumSolutions))
-percounter = 0
+solutions = np.zeros((precipitationvalues,maxNumSolutions))
 
-pericipation = np.linspace(0,5,pericipationvalues)
-for per in pericipation:
+precipitation = np.linspace(0,5,precipitationvalues)
+
+for precounter, pre in enumerate(precipitation):
     solcounter = 0
     T = np.linspace(-1,101,Tvalues)
-    dt = dTdt(per,T)
-    dt = dt**2
+    dt_ = dTdt(pre,T)
+    dt = dt_**2
     for k in range(Tvalues-2):
-        if((dt.item(k+1))<(dt.item(k))):
-            if((dt.item(k+1))<(dt.item(k+2))):
-                solutions.itemset((percounter,solcounter), T.item(k))
-                solcounter = solcounter + 1
-        
-    percounter = percounter + 1
+        if ( dt[k+1] < dt[k] ):
+            if ( dt[k+1] < dt[k+2] ):
+                if ( dt_[k] < 0 and dt_[k+2] > 0 ) or ( dt_[k] > 0 and dt_[k+2] < 0 ) :
+                    solutions.itemset((precounter,solcounter), T[k])
+                    solcounter = solcounter + 1
+
+# ----- alternative Methode -----
+# ----- funktioniert leider nicht so irre gut -----
+#
+# maxNumSolutions = 5
+# precipitationvalues = 1000
+# Tvalues = 10000
+# altsolutions = np.zeros((precipitationvalues,maxNumSolutions))
+#
+# precipitation = np.linspace(0,5,precipitationvalues)
+#
+# for precounter, pre in enumerate(precipitation):
+#     solcounter = 0
+#     T = np.linspace(-1,101,Tvalues)
+#     dt = dTdt(pre,T)
+#     for k in range(Tvalues-1):
+#         if( dt[k] > 0 ):
+#             if( dt[k+1] < 0 ):
+#                 altsolutions.itemset((precounter,solcounter), T[k])
+#                 solcounter = solcounter + 1
+#         elif( dt[k] < 0 ):
+#             if( dt[k+1] > 0 ):
+#                 altsolutions.itemset((precounter,solcounter), T[k])
+#                 solcounter = solcounter + 1
+
 solutions.sort(axis=1)
-print "Die Antwort lautet: " + str(solutions)
-plt.plot(pericipation,solutions)
+#print "Die Antwort lautet: " + str(solutions)
+plt.figure(2)
+plt.plot(precipitation,solutions)
 plt.grid()
+
 plt.show()
