@@ -24,57 +24,55 @@ def dPdt(P,T):
 plt.figure(1)
 T = np.linspace(1,100,1000)
 plt.plot(T,dTdt(1.5,T))
-plt.plot(T,dTdt(1.5,T)**2)
+#plt.plot(T,dTdt(1.5,T)**2)
 plt.grid()
 
 
 maxNumSolutions = 5
-precipitationvalues = 1000
+precipitationvalues = 10000
 Tvalues = 10000
-solutions = np.zeros((precipitationvalues,maxNumSolutions))
+solutionsPstable = []
+solutionsTstable = []
+solutionsPunstable = []
+solutionsTunstable = []
 
 precipitation = np.linspace(0,5,precipitationvalues)
 
-for precounter, pre in enumerate(precipitation):
-    solcounter = 0
+def zeroSolutions(pre):
+    zeropointsTstable = []
+    zeropointsPstable = []
+    zeropointsTunstable = []
+    zeropointsPunstable = []
     T = np.linspace(-1,101,Tvalues)
     dt_ = dTdt(pre,T)
     dt = dt_**2
     for k in range(Tvalues-2):
         if ( dt[k+1] < dt[k] ):
             if ( dt[k+1] < dt[k+2] ):
-                if ( dt_[k] < 0 and dt_[k+2] > 0 ) or ( dt_[k] > 0 and dt_[k+2] < 0 ) :
-                    solutions.itemset((precounter,solcounter), T[k])
-                    solcounter = solcounter + 1
+                if ( dt_[k] < 0 and dt_[k+2] > 0 ):
+                    zeropointsTunstable.append( T[k] )
+                    zeropointsPunstable.append( pre )
+                if ( dt_[k] > 0 and dt_[k+2] < 0 ):
+                    zeropointsTstable.append( T[k] )
+                    zeropointsPstable.append( pre )
 
-# ----- alternative Methode -----
-# ----- funktioniert leider nicht so irre gut -----
-#
-# maxNumSolutions = 5
-# precipitationvalues = 1000
-# Tvalues = 10000
-# altsolutions = np.zeros((precipitationvalues,maxNumSolutions))
-#
-# precipitation = np.linspace(0,5,precipitationvalues)
-#
-# for precounter, pre in enumerate(precipitation):
-#     solcounter = 0
-#     T = np.linspace(-1,101,Tvalues)
-#     dt = dTdt(pre,T)
-#     for k in range(Tvalues-1):
-#         if( dt[k] > 0 ):
-#             if( dt[k+1] < 0 ):
-#                 altsolutions.itemset((precounter,solcounter), T[k])
-#                 solcounter = solcounter + 1
-#         elif( dt[k] < 0 ):
-#             if( dt[k+1] > 0 ):
-#                 altsolutions.itemset((precounter,solcounter), T[k])
-#                 solcounter = solcounter + 1
+    return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
 
-solutions.sort(axis=1)
+for precounter, pre in enumerate(precipitation):
+    print(pre)
+    zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable = zeroSolutions(pre)
+    solutionsPstable.extend(zeropointsPstable)
+    solutionsTstable.extend(zeropointsTstable)
+    solutionsPunstable.extend(zeropointsPunstable)
+    solutionsTunstable.extend(zeropointsTunstable)
+
+
 #print "Die Antwort lautet: " + str(solutions)
+solutionsTstable,solutionsPstable = zip(*sorted(zip(solutionsTstable,solutionsPstable)))
+solutionsTunstable,solutionsPunstable = zip(*sorted(zip(solutionsTunstable,solutionsPunstable)))
 plt.figure(2)
-plt.plot(precipitation,solutions)
+plt.plot(solutionsPstable,solutionsTstable,'k-')
+plt.plot(solutionsPunstable,solutionsTunstable,'k--')
 plt.grid()
 
 plt.show()
