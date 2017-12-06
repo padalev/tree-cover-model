@@ -31,7 +31,7 @@ plt.grid()
 
 maxNumSolutions = 5
 precipitationvalues = 10000
-Tvalues = 10000
+Tvalues = 1000
 solutionsPstable = []
 solutionsTstable = []
 solutionsPunstable = []
@@ -58,25 +58,26 @@ def zeroSolutions(pre):
                     zeropointsPstable.append( pre )
     return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
 
-Tvalues = 10
+#Tvalues = 10
 
-def zeroSolutionsNewton(pre):
-    zeropointsTstable = []
-    zeropointsPstable = []
-    zeropointsTunstable = []
-    zeropointsPunstable = []
-    T = np.linspace(-1,101,Tvalues)
-    def dTdtrun(x):
-        P = pre
-        return dTdt(x,P)
-    for k in range(Tvalues):
-        zeropointsTstable.append( optimize.newton( dTdtrun, T[k], maxiter=50 ) )
-        zeropointsPstable.append( pre )
-    return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
+#def zeroSolutionsNewton(pre):
+zeropointsTstable = []
+zeropointsPstable = []
+zeropointsTunstable = []
+zeropointsPunstable = []
+T = np.linspace(-1,101,Tvalues)
+def dTdtrun(x):
+    P = pre
+    return dTdt(x,P)
+#for k in range(Tvalues):
+plot(T,dTdtrun(T))
+print( optimize.newton( dTdtrun, 50, maxiter=50 ) )
+#zeropointsPstable.append( pre )
+return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
 
 for precounter, pre in enumerate(precipitation):
     print(pre)
-    zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable = zeroSolutions(pre)
+    zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable = zeroSolutionsNewton(pre)
     solutionsPstable.extend(zeropointsPstable)
     solutionsTstable.extend(zeropointsTstable)
     solutionsPunstable.extend(zeropointsPunstable)
@@ -84,11 +85,11 @@ for precounter, pre in enumerate(precipitation):
 
 
 #print "Die Antwort lautet: " + str(solutions)
-solutionsTstable,solutionsPstable = zip(*sorted(zip(solutionsTstable,solutionsPstable)))
+#solutionsTstable,solutionsPstable = zip(*sorted(zip(solutionsTstable,solutionsPstable)))
 #solutionsTunstable,solutionsPunstable = zip(*sorted(zip(solutionsTunstable,solutionsPunstable)))
-plt.figure(2)
-plt.plot(solutionsPstable,solutionsTstable,'k-')
-plt.plot(solutionsPunstable,solutionsTunstable,'k--')
+#plt.figure(2)
+#plt.plot(solutionsPstable,solutionsTstable,'k-')
+#plt.plot(solutionsPunstable,solutionsTunstable,'k--')
 plt.grid()
 
 plt.show()
