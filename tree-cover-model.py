@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import ode
+from scipy import optimize
 
 h_A = 10
 h_f = 64
@@ -15,7 +16,7 @@ r_P = 1
 
 def r(P):
     return P/(h_P + P)*r_m
-def dTdt(P,T):
+def dTdt(T,P):
     return P/(h_P + P)*r_m*T*(1-T/K)-m_A*T*h_A/(T + h_A) - m_f*T*h_f**p/(h_f**p + T**p)
 def dPdt(P,T):
     return r_P*((P + b*T/K) - P)
@@ -23,7 +24,7 @@ def dPdt(P,T):
 
 plt.figure(1)
 T = np.linspace(1,100,1000)
-plt.plot(T,dTdt(1.5,T))
+plt.plot(T,dTdt(T,1.5))
 #plt.plot(T,dTdt(1.5,T)**2)
 plt.grid()
 
@@ -44,7 +45,7 @@ def zeroSolutions(pre):
     zeropointsTunstable = []
     zeropointsPunstable = []
     T = np.linspace(-1,101,Tvalues)
-    dt_ = dTdt(pre,T)
+    dt_ = dTdt(T,pre)
     dt = dt_**2
     for k in range(Tvalues-2):
         if ( dt[k+1] < dt[k] ):
@@ -55,7 +56,22 @@ def zeroSolutions(pre):
                 if ( dt_[k] > 0 and dt_[k+2] < 0 ):
                     zeropointsTstable.append( T[k] )
                     zeropointsPstable.append( pre )
+    return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
 
+Tvalues = 10
+
+def zeroSolutionsNewton(pre):
+    zeropointsTstable = []
+    zeropointsPstable = []
+    zeropointsTunstable = []
+    zeropointsPunstable = []
+    T = np.linspace(-1,101,Tvalues)
+    def dTdtrun(x):
+        P = pre
+        return dTdt(x,P)
+    for k in range(Tvalues):
+        zeropointsTstable.append( optimize.newton( dTdtrun, T[k], maxiter=50 ) )
+        zeropointsPstable.append( pre )
     return zeropointsPstable, zeropointsTstable, zeropointsPunstable, zeropointsTunstable
 
 for precounter, pre in enumerate(precipitation):
@@ -69,7 +85,7 @@ for precounter, pre in enumerate(precipitation):
 
 #print "Die Antwort lautet: " + str(solutions)
 solutionsTstable,solutionsPstable = zip(*sorted(zip(solutionsTstable,solutionsPstable)))
-solutionsTunstable,solutionsPunstable = zip(*sorted(zip(solutionsTunstable,solutionsPunstable)))
+#solutionsTunstable,solutionsPunstable = zip(*sorted(zip(solutionsTunstable,solutionsPunstable)))
 plt.figure(2)
 plt.plot(solutionsPstable,solutionsTstable,'k-')
 plt.plot(solutionsPunstable,solutionsTunstable,'k--')
