@@ -17,11 +17,11 @@ dPdt = @(P,T) r_P.*((P + b.*T./K) - P); % Not used for now
 
 P = 3;
 
-ConvergenceLength = 1e2;
-TimeStep = 3e-1;
+ConvergenceLength = 1e3;
+TimeStep = 5e-1;
 C0 = zeros(ConvergenceLength,1);
 
-defoValues = [linspace(-2,5,1000),linspace(5,-2,1000),linspace(-2,1/2,1000),linspace(1/2,-2,1000)];
+defoValues = [linspace(-2,3,1000),linspace(3,-2,1000),linspace(-2,1/2,1000),linspace(1/2,-2,1000)];
 defo = [];
 
 for i = 1:length(defoValues)
@@ -46,5 +46,47 @@ for ts=1:length(defo)-1
 end
 
 plot(defoValues,convergedT,'.k')
-plot(defo,T,'.k')
-plot(Time,T,'.k')
+%plot(defo,T,'.k')
+%plot(Time,T,'.k')
+defoConstTime = reshape(Time,[ConvergenceLength,length(defoValues)]);
+defoConstT = reshape(T,[ConvergenceLength,length(defoValues)]);
+
+for i= 1:length(defoValues)
+   defoConstTime(:,i) =  defoConstTime(:,i) - defoConstTime(1,i);
+   defoConstT(:,i) =  defoConstT(:,i) - defoConstT(end,i);
+end
+
+plot(defoConstTime(:,3700:3800),defoConstT(:,3700:3800))
+
+timeConstants = defoValues.*0;
+amplitudes = defoValues.*0;
+
+for i = 1:length(defoValues)
+    i
+   [tcn,an] = fitTimeConst(defoConstTime(:,i),defoConstT(:,i));
+   timeConstants(i) = tcn;
+   amplitudes(i) = an;
+end
+ 
+plot(timeConstants)
+
+
+
+save('DynamicResults.mat','T','Time','amplitudes','convergedT','defo','defoConstT','defoConstTime','defoValues','timeConstants');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
