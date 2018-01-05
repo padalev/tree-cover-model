@@ -15,13 +15,17 @@ expansionrate = @(P)  P./(h_P + P).*r_m;
 dTdt = @(P,T,deforest) expansionrate(P).*T.*(1-T./K)-m_A.*T.*h_A/(T + h_A) - m_f.*T.*h_f.^p/(h_f.^p + T.^p) - deforest;
 dPdt = @(P,T) r_P.*((P + b.*T./K) - P); % Not used for now
 
-P = 3;
+P = 1.5; %1.5 nice for visibility, 5.0 for forest state analysis
+endpoint1 = -0.486;
 
-ConvergenceLength = 1e3;
+ConvergenceLength = 1e4;
 TimeStep = 5e-1;
 C0 = zeros(ConvergenceLength,1);
 
-defoValues = [linspace(-2,3,1000),linspace(3,-2,1000),linspace(-2,1/2,1000),linspace(1/2,-2,1000)];
+pointDensity = 5e1;
+
+%defoValues = [linspace(-2,3,pointDensity),linspace(3,-2,pointDensity),linspace(-2,1/2,pointDensity),linspace(1/2,-2,pointDensity)];
+defoValues = endpoint1 - logspace(0,-3,pointDensity);
 defo = [];
 
 for i = 1:length(defoValues)
@@ -45,7 +49,7 @@ for ts=1:length(defo)-1
     end
 end
 
-plot(defoValues,convergedT,'.k')
+%plot(defoValues,convergedT,'.k')
 %plot(defo,T,'.k')
 %plot(Time,T,'.k')
 defoConstTime = reshape(Time,[ConvergenceLength,length(defoValues)]);
@@ -56,7 +60,7 @@ for i= 1:length(defoValues)
    defoConstT(:,i) =  defoConstT(:,i) - defoConstT(end,i);
 end
 
-plot(defoConstTime(:,3700:3800),defoConstT(:,3700:3800))
+%plot(defoConstTime(:,3700:3800),defoConstT(:,3700:3800))
 
 timeConstants = defoValues.*0;
 amplitudes = defoValues.*0;
@@ -68,11 +72,11 @@ for i = 1:length(defoValues)
    amplitudes(i) = an;
 end
  
-plot(timeConstants)
+%plot(timeConstants)
 
 
 
-save('DynamicResults.mat','T','Time','amplitudes','convergedT','defo','defoConstT','defoConstTime','defoValues','timeConstants');
+save('DynamicResults1.5zoom.mat','T','Time','amplitudes','convergedT','defo','defoConstT','defoConstTime','defoValues','timeConstants');
 
 
 
