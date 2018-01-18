@@ -1,6 +1,6 @@
 clear; clc;
 close all;
-load('DynamicResults1.5zoom.mat');
+load('DynamicResults1.5big.mat');
 
 zeropoint = -0.4878899;
 
