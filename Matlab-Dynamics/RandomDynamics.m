@@ -15,7 +15,7 @@ expansionrate = @(P)  P./(h_P + P).*r_m;
 dTdt = @(P,T,deforest) expansionrate(P).*T.*(1-T./K)-m_A.*T.*h_A/(T + h_A) - m_f.*T.*h_f.^p/(h_f.^p + T.^p) - deforest;
 dPdt = @(P,T) r_P.*((P + b.*T./K) - P); % Not used for now
 
-defolength = 1e3;
+defolength = 2;
 defoValues = linspace(-1.9,-0.4,defolength);
 acValues = defoValues.*0;
 variValues = defoValues.*0;
@@ -25,8 +25,8 @@ meanP = 1.5;
 variP = 0.1;
 
 TimeStep = 1;
-preRun = 1e4;
-runTime = 1e5;
+preRun = 1e5;
+runTime = 1e4;
 
 
 for defocounter = 1:defolength
@@ -47,10 +47,15 @@ for ts=1:length(pValues)-1
     Time(ts+1) = Time(ts)+TimeStep; 
 end
 
-%plot(pValues,T,'.k')
-%figure
-%plot(Time,T,'.k')
-%figure
+figure
+plot(Time(1000:3000),T(1000:3000),'-k','LineWidth',2)
+axis([1000 2000 38.8 39.8])
+xlabel('Time (yr)');
+ylabel('Tree cover (%)');
+set(gca,'FontSize',25,'LineWidth',3.0);
+r = 200; % pixels per inch
+set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [0 0 3600 1000]/r);
+print(gcf,'-dpng',sprintf('-r%d',r), 'plot.png');
 
 Tconv(defocounter) = T(end);
 
@@ -68,18 +73,28 @@ end
 
 autocorr = autocorr/autocorr(1);
 
-%plot(autocorrf,autocorr)
+% plot(autocorrf,autocorr,'-k','LineWidth',3)
+% hold on
+% plot((linspace(0,100)),0*linspace(0,1), '-k','LineWidth',1.5)
+% axis([0 100 -0.2 1])
+% xlabel('\Delta T (yr)');
+% ylabel('ACF');
+% set(gca,'FontSize',25,'LineWidth',3.0);
+% r = 200; % pixels per inch
+% set(gcf, 'PaperUnits', 'inches', 'PaperPosition', [0 0 3600 1000]/r);
+% print(gcf,'-dpng',sprintf('-r%d',r), 'plot.png');
 
 acValues(defocounter) = (1-autocorr(2));
 
 variValues(defocounter) = sum(T.^2)/runTime;
 
 end
+% figure
+% plot(defoValues, acValues);
+% figure
+% plot(defoValues, variValues);
 
-%plot(defoValues, acValues);
-%plot(defoValues, variValues);
-
-save('RandomDynamicResults_1.5_0.1v.mat','defoValues','acValues','variValues','Tconv');
+%save('RandomDynamicResults_1.5_0.1v.mat','defoValues','acValues','variValues','Tconv');
 
 
 
