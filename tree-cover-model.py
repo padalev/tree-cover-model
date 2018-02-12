@@ -120,5 +120,9 @@ solutionsTunstable, solutionsPunstable, solutionsTstable, solutionsPstable = sor
 plt.figure(2)
 plotnsort(solutionsTunstable, solutionsPunstable, solutionsTstable, solutionsPstable)
 plt.grid()
+plt.xlabel(r'Precipitation in mm yr$^{-1}$')
+plt.ylabel(r'Tree Cover in %')
+
+plt.savefig('final.pdf')
 
 plt.show()
